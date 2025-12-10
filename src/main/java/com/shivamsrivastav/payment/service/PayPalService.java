@@ -27,7 +27,77 @@ public class PayPalService {
 
     private static final Logger log = LoggerFactory.getLogger(PayPalService.class);
 
+    @org.springframework.beans.factory.annotation.Value("${paypal.client.id}")
+    private String clientId;
+
     private final APIContext apiContext;
+
+    private boolean isMockMode() {
+        return clientId == null || clientId.startsWith("YOUR_") || clientId.isEmpty();
+    }
+
+    private Payment mockCreatePayment(CreatePaymentRequest request) {
+        log.warn("MOCK MODE: Creating fake payment response");
+        Payment payment = new Payment();
+        payment.setId("PAYID-MOCK-" + System.currentTimeMillis());
+        payment.setState("created");
+        payment.setIntent(request.getPaymentIntent().toString().toLowerCase());
+
+        // Mock Transactions
+        Amount amount = new Amount();
+        amount.setCurrency(request.getCurrency());
+        amount.setTotal(request.getAmount().setScale(2, RoundingMode.HALF_UP).toString());
+
+        Transaction transaction = new Transaction();
+        transaction.setAmount(amount);
+        List<Transaction> transactions = new ArrayList<>();
+        transactions.add(transaction);
+        payment.setTransactions(transactions);
+
+        // Mock Links
+        List<Links> links = new ArrayList<>();
+        Links approvalLink = new Links();
+        approvalLink.setRel("approval_url");
+        // Redirect to our own success endpoint with fake IDs
+        approvalLink.setHref("http://localhost:8089/api/payments/success?paymentId=" + payment.getId()
+                + "&PayerID=MOCK_PAYER_" + System.currentTimeMillis());
+        links.add(approvalLink);
+        payment.setLinks(links);
+
+        return payment;
+    }
+
+    private Payment mockExecutePayment(String paymentId, String payerId) {
+        log.warn("MOCK MODE: Executing fake payment");
+        Payment payment = new Payment();
+        payment.setId(paymentId);
+        payment.setState("approved");
+        payment.setCart(payerId);
+
+        // Mock Transaction
+        Transaction transaction = new Transaction();
+        Amount amount = new Amount();
+        amount.setTotal("100.00"); // Simplified for mock
+        amount.setCurrency("USD");
+        transaction.setAmount(amount);
+
+        // Mock Related Resources
+        RelatedResources relatedResources = new RelatedResources();
+        Sale sale = new Sale();
+        sale.setId("SALE-" + System.currentTimeMillis());
+        sale.setState("completed");
+        relatedResources.setSale(sale);
+
+        Authorization authorization = new Authorization();
+        authorization.setId("AUTH-" + System.currentTimeMillis());
+        authorization.setState("authorized");
+        relatedResources.setAuthorization(authorization);
+
+        transaction.setRelatedResources(List.of(relatedResources));
+        payment.setTransactions(List.of(transaction));
+
+        return payment;
+    }
 
     public PayPalService(APIContext apiContext) {
         this.apiContext = apiContext;
@@ -69,7 +139,11 @@ public class PayPalService {
         payment.setTransactions(transactions);
         payment.setRedirectUrls(redirectUrls);
 
-        // 6. Execute API Call
+        // 6. Execute API Call (Mock or Real)
+        if (isMockMode()) {
+            return mockCreatePayment(request);
+        }
+
         try {
             return payment.create(apiContext);
         } catch (PayPalRESTException e) {
@@ -91,6 +165,10 @@ public class PayPalService {
 
         PaymentExecution paymentExecution = new PaymentExecution();
         paymentExecution.setPayerId(payerId);
+
+        if (isMockMode()) {
+            return mockExecutePayment(paymentId, payerId);
+        }
 
         try {
             return payment.execute(apiContext, paymentExecution);
