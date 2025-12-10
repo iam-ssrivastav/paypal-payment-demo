@@ -46,7 +46,10 @@ docker-compose up -d
 ```
 
 ### 2. Configure Credentials
-Update `src/main/resources/application.yml`:
+Update `src/main/resources/application.yml`. 
+*   **Option A (Mock Mode):** Leave as default (ID starts with `YOUR_`).
+*   **Option B (Real Mode):** Enter your actual Sandbox Client ID/Secret.
+
 ```yaml
 paypal:
   client:
