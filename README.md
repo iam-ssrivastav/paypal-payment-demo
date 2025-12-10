@@ -22,30 +22,7 @@ A comprehensive Spring Boot application demonstrating PayPal payment integration
 
 ## 🏗️ Architecture
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                      Frontend (index.html)                      │
-│                   Beautiful Dark Mode Checkout                  │
-└─────────────────────────────────┬───────────────────────────────┘
-                                  │
-                                  ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                     REST Controllers                            │
-│  PaymentController │ WebhookController │ PageController         │
-└─────────────────────────────────┬───────────────────────────────┘
-                                  │
-                                  ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                      Service Layer                              │
-│  PaymentService │ PayPalService │ WebhookService │ OrderService │
-└───────────┬─────────────────────────────────┬───────────────────┘
-            │                                 │
-            ▼                                 ▼
-┌───────────────────────┐         ┌──────────────────────────┐
-│    PayPal REST API    │         │  PostgreSQL Database     │
-│  (Sandbox/Production) │         │  Orders, Payments...     │
-└───────────────────────┘         └──────────────────────────┘
-```
+![Project Architecture](architecture.png)
 
 ---
 
@@ -88,7 +65,21 @@ Open your browser: **http://localhost:8080**
 
 ---
 
+## 🎭 Mock Mode vs Real Mode
+
+This project supports **Mock Mode** for easy testing without keys.
+
+| Mode | Trigger | Behavior |
+|------|---------|----------|
+| **Mock Mode** | `paypal.client.id` starts with `YOUR_` | Returns fake success responses immediately. Perfect for local dev. |
+| **Real Mode** | Valid `paypal.client.id` set | Calls actual PayPal Sandbox API. Requires valid credentials. |
+
+To switch to **Real Mode**, simply update `application.yml` with your actual PayPal Client ID and Secret.
+
+---
+
 ## 🔐 PayPal Sandbox Setup
+
 
 1. Go to [PayPal Developer Dashboard](https://developer.paypal.com/dashboard/)
 2. Login or create an account
