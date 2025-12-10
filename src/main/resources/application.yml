@@ -1,0 +1,63 @@
+# ================================
+# PayPal Payment Gateway Demo
+# ================================
+
+server:
+  port: 8080
+
+spring:
+  application:
+    name: paypal-payment-demo
+    
+  # PostgreSQL Configuration
+  datasource:
+    url: jdbc:postgresql://localhost:5433/paymentdb
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+      
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+
+  thymeleaf:
+    cache: false
+    prefix: classpath:/templates/
+    suffix: .html
+
+# ================================
+# PayPal Configuration
+# ================================
+# Get your sandbox credentials from: https://developer.paypal.com
+# 1. Create PayPal Developer account
+# 2. Go to Dashboard > My Apps & Credentials
+# 3. Create a new app in Sandbox mode
+# 4. Copy Client ID and Secret below
+
+paypal:
+  mode: sandbox  # sandbox or live
+  client:
+    id: ${PAYPAL_CLIENT_ID:YOUR_SANDBOX_CLIENT_ID}
+    secret: ${PAYPAL_CLIENT_SECRET:YOUR_SANDBOX_CLIENT_SECRET}
+  # URLs for redirect after payment
+  success-url: http://localhost:8080/api/payments/success
+  cancel-url: http://localhost:8080/api/payments/cancel
+
+# ================================
+# Logging Configuration
+# ================================
+logging:
+  level:
+    com.shivamsrivastav.payment: DEBUG
+    com.paypal: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

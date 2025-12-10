@@ -1,0 +1,228 @@
+{
+    "info": {
+        "_postman_id": "b3e9a2b1-5e8f-4d6a-9c7b-1f2e3d4c5b6a",
+        "name": "PayPal Payment Demo",
+        "description": "Collection for testing spring-boot-paypal-gateway endpoints",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "0. Create Internal Order (Step 1)",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"description\": \"2x Premium T-Shirts\",\n  \"amount\": 100.00,\n  \"customerEmail\": \"customer@example.com\",\n  \"customerName\": \"John Doe\"\n}"
+                },
+                "url": {
+                    "raw": "http://localhost:8081/api/orders/create",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "8081",
+                    "path": [
+                        "api",
+                        "orders",
+                        "create"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "1. Create Payment (Step 2)",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"amount\": 100.00,\n  \"currency\": \"USD\",\n  \"description\": \"Payment for Order\",\n  \"paymentIntent\": \"CAPTURE\",\n  \"orderId\": 1\n}"
+                },
+                "url": {
+                    "raw": "http://localhost:8081/api/payments/create",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "8081",
+                    "path": [
+                        "api",
+                        "payments",
+                        "create"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "2. Execute Payment (Step 3)",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"paymentId\": \"PASTE_PAYMENT_ID_HERE\",\n  \"payerId\": \"PASTE_PAYER_ID_HERE\"\n}"
+                },
+                "url": {
+                    "raw": "http://localhost:8081/api/payments/execute",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "8081",
+                    "path": [
+                        "api",
+                        "payments",
+                        "execute"
+                    ]
+                },
+                "description": "Call this after user approves payment on PayPal. Get paymentId and payerId from the redirect URL."
+            },
+            "response": []
+        },
+        {
+            "name": "3. Create Payment (Authorize)",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"amount\": 200.00,\n  \"currency\": \"USD\",\n  \"description\": \"Test Authorization\",\n  \"paymentIntent\": \"AUTHORIZE\"\n}"
+                },
+                "url": {
+                    "raw": "http://localhost:8081/api/payments/create",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "8081",
+                    "path": [
+                        "api",
+                        "payments",
+                        "create"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "4. Capture Authorization",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"authorizationId\": \"PASTE_AUTH_ID_HERE\",\n  \"amount\": 200.00,\n  \"currency\": \"USD\",\n  \"isFinalCapture\": true\n}"
+                },
+                "url": {
+                    "raw": "http://localhost:8081/api/payments/capture",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "8081",
+                    "path": [
+                        "api",
+                        "payments",
+                        "capture"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "5. Refund Payment",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"captureId\": \"PASTE_CAPTURE_ID_HERE\",\n  \"amount\": 50.00,\n  \"currency\": \"USD\",\n  \"reason\": \"Refund Request\"\n}"
+                },
+                "url": {
+                    "raw": "http://localhost:8081/api/payments/refund",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "8081",
+                    "path": [
+                        "api",
+                        "payments",
+                        "refund"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "6. Simulate Webhook",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"id\": \"WH-TEST-123\",\n  \"event_type\": \"PAYMENT.CAPTURE.COMPLETED\",\n  \"resource_type\": \"capture\",\n  \"resource\": {\n    \"id\": \"TEST-CAPTURE-ID\",\n    \"amount\": {\n      \"total\": \"100.00\",\n      \"currency\": \"USD\"\n    },\n    \"status\": \"COMPLETED\"\n  }\n}"
+                },
+                "url": {
+                    "raw": "http://localhost:8081/api/webhooks/paypal",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "8081",
+                    "path": [
+                        "api",
+                        "webhooks",
+                        "paypal"
+                    ]
+                }
+            },
+            "response": []
+        }
+    ]
+}

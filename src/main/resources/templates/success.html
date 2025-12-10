@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Success</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 3rem;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .success-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            margin: 0 auto 1.5rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #10b981;
+        }
+
+        p {
+            color: #94a3b8;
+            margin-bottom: 1.5rem;
+        }
+
+        .details {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: left;
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-row .label {
+            color: #94a3b8;
+        }
+
+        .detail-row .value {
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #7c3aed, #00d4ff);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .error-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            margin: 0 auto 1.5rem;
+        }
+
+        .error h1 {
+            color: #ef4444;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Success Case -->
+    <div class="card" th:if="${success}">
+        <div class="success-icon">✓</div>
+        <h1>Payment Successful!</h1>
+        <p>Thank you for your purchase. Your payment has been processed.</p>
+
+        <div class="details" th:if="${payment != null}">
+            <div class="detail-row">
+                <span class="label">Payment ID</span>
+                <span class="value" th:text="${payment.paypalPaymentId}">PAY-XXX</span>
+            </div>
+            <div class="detail-row">
+                <span class="label">Amount</span>
+                <span class="value">
+                    <span th:text="${payment.currency}">USD</span>
+                    <span th:text="${payment.amount}">99.99</span>
+                </span>
+            </div>
+            <div class="detail-row">
+                <span class="label">Status</span>
+                <span class="value" th:text="${payment.status}">CAPTURED</span>
+            </div>
+            <div class="detail-row" th:if="${payment.payerEmail != null}">
+                <span class="label">Payer Email</span>
+                <span class="value" th:text="${payment.payerEmail}">email@example.com</span>
+            </div>
+        </div>
+
+        <a href="/" class="btn">← Back to Demo</a>
+    </div>
+
+    <!-- Error Case -->
+    <div class="card error" th:if="${!success}">
+        <div class="error-icon">✕</div>
+        <h1>Payment Failed</h1>
+        <p th:text="${error}">An error occurred while processing your payment.</p>
+        <a href="/" class="btn">← Try Again</a>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PayPal Payment Demo - Checkout</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        header p {
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: #00d4ff;
+        }
+
+        .product-card {
+            text-align: center;
+        }
+
+        .product-image {
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(135deg, #7c3aed, #00d4ff);
+            border-radius: 16px;
+            margin: 0 auto 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+        }
+
+        .product-name {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-price {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #10b981;
+            margin-bottom: 1rem;
+        }
+
+        .product-description {
+            color: #94a3b8;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #00d4ff;
+        }
+
+        .form-group select option {
+            background: #1a1a2e;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #0070ba, #003087);
+            color: #fff;
+            margin-bottom: 1rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 112, 186, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .concept-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .concept-list li {
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .concept-list li .icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #7c3aed, #00d4ff);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .concept-list li .text h4 {
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .concept-list li .text p {
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        .status-box {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 12px;
+            display: none;
+        }
+
+        .status-box.error {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .status-box h3 {
+            margin-bottom: 0.5rem;
+        }
+
+        .status-box pre {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 0.85rem;
+            margin-top: 1rem;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+            color: #94a3b8;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .divider span {
+            padding: 0 1rem;
+            font-size: 0.9rem;
+        }
+
+        .api-section {
+            margin-top: 3rem;
+        }
+
+        .api-endpoints {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .endpoint {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #00d4ff;
+        }
+
+        .endpoint .method {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+
+        .endpoint .method.post {
+            background: #10b981;
+        }
+
+        .endpoint .method.get {
+            background: #3b82f6;
+        }
+
+        .endpoint .path {
+            font-family: monospace;
+            color: #00d4ff;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .loading .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #00d4ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        footer {
+            text-align: center;
+            padding: 3rem 0;
+            color: #64748b;
+        }
+
+        footer a {
+            color: #00d4ff;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>💳 PayPal Payment Gateway Demo</h1>
+            <p>Learn all payment concepts with this interactive demo</p>
+        </header>
+
+        <div class="main-content">
+            <!-- Product & Checkout Section -->
+            <div class="card product-card">
+                <div class="product-image">🎧</div>
+                <h3 class="product-name">Premium Wireless Headphones</h3>
+                <p class="product-price">$99.99</p>
+                <p class="product-description">Experience crystal-clear audio with our premium wireless headphones.
+                    Perfect for music lovers and professionals.</p>
+
+                <div class="form-group">
+                    <label for="amount">Amount (USD)</label>
+                    <input type="number" id="amount" value="99.99" min="0.01" step="0.01">
+                </div>
+
+                <div class="form-group">
+                    <label for="intent">Payment Intent</label>
+                    <select id="intent">
+                        <option value="CAPTURE">CAPTURE - Charge Immediately</option>
+                        <option value="AUTHORIZE">AUTHORIZE - Hold Funds (Capture Later)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <input type="text" id="description" value="Premium Wireless Headphones">
+                </div>
+
+                <button class="btn btn-primary" onclick="createPayment()">
+                    🔒 Pay with PayPal
+                </button>
+
+                <div class="divider"><span>OR TEST API</span></div>
+
+                <button class="btn btn-secondary" onclick="testPaymentAPI()">
+                    🧪 Test Payment Creation API
+                </button>
+
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Processing payment...</p>
+                </div>
+
+                <div class="status-box" id="statusBox">
+                    <h3 id="statusTitle">Payment Status</h3>
+                    <p id="statusMessage"></p>
+                    <pre id="statusData"></pre>
+                </div>
+            </div>
+
+            <!-- Concepts Section -->
+            <div class="card">
+                <h2>📚 Payment Concepts Covered</h2>
+                <ul class="concept-list">
+                    <li>
+                        <div class="icon">💰</div>
+                        <div class="text">
+                            <h4>One-Time Payments</h4>
+                            <p>Standard checkout flow with immediate capture</p>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="icon">🔐</div>
+                        <div class="text">
+                            <h4>Authorization & Capture</h4>
+                            <p>Hold funds for later capture (hotels, rentals)</p>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="icon">↩️</div>
+                        <div class="text">
+                            <h4>Refunds</h4>
+                            <p>Full and partial refunds after capture</p>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="icon">🔄</div>
+                        <div class="text">
+                            <h4>Subscriptions</h4>
+                            <p>Recurring billing for membership plans</p>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="icon">📡</div>
+                        <div class="text">
+                            <h4>Webhooks</h4>
+                            <p>Real-time payment event notifications</p>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="icon">🔑</div>
+                        <div class="text">
+                            <h4>Idempotency</h4>
+                            <p>Prevent duplicate payments with unique keys</p>
+                        </div>
+                    </li>
+                </ul>
+
+                <div class="api-section">
+                    <h2>🔌 API Endpoints</h2>
+                    <div class="api-endpoints">
+                        <div class="endpoint">
+                            <span class="method post">POST</span>
+                            <span class="path">/api/payments/create</span>
+                            <p style="margin-top: 0.5rem; font-size: 0.85rem; color: #94a3b8;">Create a new payment</p>
+                        </div>
+                        <div class="endpoint">
+                            <span class="method post">POST</span>
+                            <span class="path">/api/payments/execute</span>
+                            <p style="margin-top: 0.5rem; font-size: 0.85rem; color: #94a3b8;">Execute after approval
+                            </p>
+                        </div>
+                        <div class="endpoint">
+                            <span class="method post">POST</span>
+                            <span class="path">/api/payments/capture</span>
+                            <p style="margin-top: 0.5rem; font-size: 0.85rem; color: #94a3b8;">Capture authorized
+                                payment</p>
+                        </div>
+                        <div class="endpoint">
+                            <span class="method post">POST</span>
+                            <span class="path">/api/payments/refund</span>
+                            <p style="margin-top: 0.5rem; font-size: 0.85rem; color: #94a3b8;">Refund captured payment
+                            </p>
+                        </div>
+                        <div class="endpoint">
+                            <span class="method get">GET</span>
+                            <span class="path">/api/payments/{id}</span>
+                            <p style="margin-top: 0.5rem; font-size: 0.85rem; color: #94a3b8;">Get payment details</p>
+                        </div>
+                        <div class="endpoint">
+                            <span class="method post">POST</span>
+                            <span class="path">/api/webhooks/paypal</span>
+                            <p style="margin-top: 0.5rem; font-size: 0.85rem; color: #94a3b8;">Receive PayPal webhooks
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Built with ❤️ by <a href="#">Shivam Srivastav</a></p>
+            <p style="margin-top: 0.5rem; font-size: 0.85rem;">
+                PayPal REST SDK • Spring Boot 3.2 • H2 Database
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+        }
+
+        function showStatus(title, message, data, isError = false) {
+            const box = document.getElementById('statusBox');
+            box.style.display = 'block';
+            box.className = isError ? 'status-box error' : 'status-box';
+            document.getElementById('statusTitle').textContent = title;
+            document.getElementById('statusMessage').textContent = message;
+            document.getElementById('statusData').textContent = JSON.stringify(data, null, 2);
+        }
+
+        async function createPayment() {
+            const amount = document.getElementById('amount').value;
+            const intent = document.getElementById('intent').value;
+            const description = document.getElementById('description').value;
+
+            showLoading(true);
+
+            try {
+                const response = await fetch('/api/payments/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        amount: parseFloat(amount),
+                        currency: 'USD',
+                        description: description,
+                        paymentIntent: intent,
+                        idempotencyKey: 'demo-' + Date.now()
+                    })
+                });
+
+                const data = await response.json();
+                showLoading(false);
+
+                if (response.ok && data.approvalUrl) {
+                    showStatus(
+                        '✅ Payment Created!',
+                        'Redirecting to PayPal for approval...',
+                        data
+                    );
+                    // Redirect to PayPal
+                    setTimeout(() => {
+                        window.location.href = data.approvalUrl;
+                    }, 2000);
+                } else {
+                    showStatus(
+                        '❌ Payment Failed',
+                        data.message || 'Unknown error occurred',
+                        data,
+                        true
+                    );
+                }
+            } catch (error) {
+                showLoading(false);
+                showStatus(
+                    '❌ Error',
+                    'Failed to create payment. Make sure the server is running.',
+                    { error: error.message },
+                    true
+                );
+            }
+        }
+
+        async function testPaymentAPI() {
+            const amount = document.getElementById('amount').value;
+            const intent = document.getElementById('intent').value;
+            const description = document.getElementById('description').value;
+
+            showLoading(true);
+
+            try {
+                const response = await fetch('/api/payments/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        amount: parseFloat(amount),
+                        currency: 'USD',
+                        description: description,
+                        paymentIntent: intent,
+                        idempotencyKey: 'test-' + Date.now()
+                    })
+                });
+
+                const data = await response.json();
+                showLoading(false);
+
+                if (response.ok) {
+                    showStatus(
+                        '✅ API Response',
+                        'Payment created successfully! (Not redirecting - this is a test)',
+                        data
+                    );
+                } else {
+                    showStatus(
+                        '❌ API Error',
+                        data.message || 'Unknown error',
+                        data,
+                        true
+                    );
+                }
+            } catch (error) {
+                showLoading(false);
+                showStatus(
+                    '❌ Connection Error',
+                    'Make sure the Spring Boot server is running on port 8080',
+                    { error: error.message },
+                    true
+                );
+            }
+        }
+    </script>
+</body>
+
+</html>
